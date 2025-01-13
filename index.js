@@ -1,17 +1,12 @@
 import * as Carousel from "./Carousel.js";
-import axios from "axios";
+import { fetchData } from "./utils/fetch.js";
+import { getData } from "./utils/axios.js";
+import API_KEY from "./utils/api_key.js";
 
-// The breed selection input element.
 const breedSelect = document.getElementById("breedSelect");
-// The information section div element.
 const infoDump = document.getElementById("infoDump");
-// The progress bar div element.
 const progressBar = document.getElementById("progressBar");
-// The get favourites button element.
 const getFavouritesBtn = document.getElementById("getFavouritesBtn");
-
-// Step 0: Store your API key here for reference and easy access.
-const API_KEY = "live_dYfTfAwgGIGOEe7nNzvhyqItnG6HM2VTwWLwZQ1TDKyPtGh2MvaU8JOODPk8BbRm";
 
 export async function favourite(imgId) {
   // your code here
@@ -19,11 +14,16 @@ export async function favourite(imgId) {
 
 // Step 1
 async function initialLoad() {
-  const response = await fetch(`https://api.thecatapi.com/v1/breeds?api_key=${API_KEY}`);
-  const breeds = await response.json();
+  let breeds;
+
+  try {
+    // breeds = await fetchData(`https://api.thecatapi.com/v1/breeds?api_key=${API_KEY}`);
+    breeds = await getData(`/breeds`);
+  } catch(error) {
+    console.log(error);
+  }
   
   breeds.forEach(breed => {
-    // only create an option element if breed has images available
     if (breed.image) {
       const option = document.createElement("option");
       option.setAttribute("value", breed.id);
@@ -47,7 +47,7 @@ async function handleSelect(e) {
 async function renderUI(breedID) {
   Carousel.clear();
   infoDump.innerHTML = '';
-  const breedData = await getBreedData(breedID);
+  const breedData = await getData(`/images/search?breed_ids=${breedID}&limit=10`);
   populateCarousel(breedData);
   renderBreedInfo(breedData[0].breeds[0]);
   Carousel.start();
@@ -58,12 +58,6 @@ function populateCarousel(catArray) {
     const carouselItem = Carousel.createCarouselItem(cat.url, "cat image", cat.id);
     Carousel.appendCarousel(carouselItem);
   });
-}
-
-async function getBreedData(id) {
-  const response = await fetch(`https://api.thecatapi.com/v1/images/search?breed_ids=${id}&limit=10&api_key=${API_KEY}`);
-  const breedData = await response.json();
-  return breedData;
 }
 
 function renderBreedInfo(breedInfo) {
