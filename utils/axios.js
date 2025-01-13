@@ -39,13 +39,46 @@ function updateProgress(progressEvent) {
 }
 
 export async function getData(url) {
-  console.log("New request...");
+  console.log("New GET request...");
+
   try {
     const response = await axios.get(url, {
       onDownloadProgress: updateProgress
     });
     return response.data;
+
   } catch(error) {
+    console.log(error);
+    throw new Error(error);
+  }
+}
+
+export async function handleFavourite(imgId) {
+  console.log("New POST request...");
+
+  try {
+    const newFavourite = await axios.post("/favourites", {
+      image_id: imgId
+    });
+    return newFavourite;
+
+  } catch(error) {
+    console.log(error);
+    throw new Error(error);
+  }
+}
+
+export async function getFavourites() {
+  console.log("New GET request...");
+
+  try {
+    const response = await axios.get("/favourites", {
+      onDownloadProgress: updateProgress
+    });
+    return response.data;
+
+  } catch(error) {
+    console.log(error);
     throw new Error(error);
   }
 }

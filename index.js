@@ -1,14 +1,24 @@
 import * as Carousel from "./Carousel.js";
-import { fetchData } from "./utils/fetch.js";
-import { getData } from "./utils/axios.js";
 import API_KEY from "./utils/api_key.js";
+import { fetchData } from "./utils/fetch.js";
+import { 
+  getData, 
+  getFavourites, 
+  handleFavourite 
+} from "./utils/axios.js";
 
 const breedSelect = document.getElementById("breedSelect");
 const infoDump = document.getElementById("infoDump");
 const getFavouritesBtn = document.getElementById("getFavouritesBtn");
 
+initialLoad();
+
+// Retrieve all favourites
+getFavouritesBtn.addEventListener("click", renderFavorites);
+
+// Favourite an image
 export async function favourite(imgId) {
-  // your code here
+  handleFavourite(imgId);
 }
 
 async function initialLoad() {
@@ -24,22 +34,35 @@ async function initialLoad() {
     }
   });
 
-  renderUI(breedSelect.value);
+  renderBreed(breedSelect.value);
 }
-initialLoad();
 
 breedSelect.addEventListener("change", handleSelect);
 
 async function handleSelect(e) {
-  renderUI(e.target.value);
+  renderBreed(e.target.value);
 }
 
-async function renderUI(breedID) {
+async function renderBreed(breedId) {
   Carousel.clear();
   infoDump.innerHTML = '';
-  const breedData = await getData(`/images/search?breed_ids=${breedID}&limit=10`);
+  const breedData = await getData(`/images/search?breed_ids=${breedId}&limit=10`);
   populateCarousel(breedData);
   renderBreedInfo(breedData[0].breeds[0]);
+  Carousel.start();
+}
+
+async function renderFavorites() {
+  const favourites = await getFavourites();
+
+  let formattedFavourites = [];
+  favourites.forEach(fav => {
+    formattedFavourites.push(fav.image);
+  });
+
+  Carousel.clear();
+  infoDump.innerHTML = `<h3 class="text-center">😻 Your Favourite Cats 😻</h3>`;
+  populateCarousel(formattedFavourites);
   Carousel.start();
 }
 
