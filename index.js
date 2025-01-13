@@ -5,8 +5,8 @@ import API_KEY from "./utils/api_key.js";
 
 const breedSelect = document.getElementById("breedSelect");
 const infoDump = document.getElementById("infoDump");
-const progressBar = document.getElementById("progressBar");
 const getFavouritesBtn = document.getElementById("getFavouritesBtn");
+const progressBar = document.getElementById("progressBar");
 
 export async function favourite(imgId) {
   // your code here
@@ -14,14 +14,8 @@ export async function favourite(imgId) {
 
 // Step 1
 async function initialLoad() {
-  let breeds;
-
-  try {
-    // breeds = await fetchData(`https://api.thecatapi.com/v1/breeds?api_key=${API_KEY}`);
-    breeds = await getData(`/breeds`);
-  } catch(error) {
-    console.log(error);
-  }
+  // breeds = await fetchData(`https://api.thecatapi.com/v1/breeds?api_key=${API_KEY}`);
+  const breeds = await getData("/breeds");
   
   breeds.forEach(breed => {
     if (breed.image) {
