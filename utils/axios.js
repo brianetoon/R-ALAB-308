@@ -1,6 +1,8 @@
 import axios from "axios";
 import API_KEY from "./api_key";
+
 const progressBar = document.getElementById("progressBar");
+const body = document.querySelector("body");
 
 // Global Defaults
 axios.defaults.baseURL = "https://api.thecatapi.com/v1";
@@ -8,8 +10,9 @@ axios.defaults.headers.common["x-api-key"] = API_KEY;
 
 // Request Interceptor
 axios.interceptors.request.use(config => {
-  progressBar.style.width = "0%";
   const requestTime = new Date().getTime();
+  progressBar.style.width = "0%";
+  body.style.cursor = "progress";
   console.log("Request time:", requestTime);
   config.metadata = {
     requestTime
@@ -23,6 +26,7 @@ axios.interceptors.request.use(config => {
 axios.interceptors.response.use(response => {
   const responseTime = new Date().getTime();
   const requestTime  = response.config.metadata.requestTime;
+  body.style.cursor = "default";
   console.log("Response time:", responseTime);
   console.log("Total duration:", responseTime - requestTime);
   return response;
@@ -35,7 +39,7 @@ function updateProgress(progressEvent) {
 }
 
 export async function getData(url) {
-  console.log("New request...")
+  console.log("New request...");
   try {
     const response = await axios.get(url, {
       onDownloadProgress: updateProgress
