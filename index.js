@@ -6,13 +6,11 @@ import API_KEY from "./utils/api_key.js";
 const breedSelect = document.getElementById("breedSelect");
 const infoDump = document.getElementById("infoDump");
 const getFavouritesBtn = document.getElementById("getFavouritesBtn");
-const progressBar = document.getElementById("progressBar");
 
 export async function favourite(imgId) {
   // your code here
 }
 
-// Step 1
 async function initialLoad() {
   // breeds = await fetchData(`https://api.thecatapi.com/v1/breeds?api_key=${API_KEY}`);
   const breeds = await getData("/breeds");
@@ -30,8 +28,6 @@ async function initialLoad() {
 }
 initialLoad();
 
-
-// Step 2
 breedSelect.addEventListener("change", handleSelect);
 
 async function handleSelect(e) {

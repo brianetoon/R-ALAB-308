@@ -1,15 +1,14 @@
 import axios from "axios";
 import API_KEY from "./api_key";
+const progressBar = document.getElementById("progressBar");
 
-const axiosInstance = axios.create({
-  baseURL: "https://api.thecatapi.com/v1",
-  headers: {
-    "x-api-key" : API_KEY
-  }
-});
+// Global Defaults
+axios.defaults.baseURL = "https://api.thecatapi.com/v1";
+axios.defaults.headers.common["x-api-key"] = API_KEY;
 
 // Request Interceptor
-axiosInstance.interceptors.request.use(config => {
+axios.interceptors.request.use(config => {
+  progressBar.style.width = "0%";
   const requestTime = new Date().getTime();
   console.log("Request time:", requestTime);
   config.metadata = {
@@ -21,7 +20,7 @@ axiosInstance.interceptors.request.use(config => {
 });
 
 // Response Interceptor
-axiosInstance.interceptors.response.use(response => {
+axios.interceptors.response.use(response => {
   const responseTime = new Date().getTime();
   const requestTime  = response.config.metadata.requestTime;
   console.log("Response time:", responseTime);
@@ -31,11 +30,16 @@ axiosInstance.interceptors.response.use(response => {
   return Promise.reject(error);
 });
 
+function updateProgress(progressEvent) {
+  progressBar.style.width = `${(progressEvent.progress * 100)}%`;
+}
+
 export async function getData(url) {
   console.log("New request...")
   try {
-    const response = await axiosInstance.get(url);
-    // console.log(response);
+    const response = await axios.get(url, {
+      onDownloadProgress: updateProgress
+    });
     return response.data;
   } catch(error) {
     throw new Error(error);
