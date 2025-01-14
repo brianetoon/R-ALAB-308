@@ -10,12 +10,11 @@ axios.defaults.headers.common["x-api-key"] = API_KEY;
 
 // Request Interceptor
 axios.interceptors.request.use(config => {
-  const requestTime = new Date().getTime();
+  const startTime = new Date().getTime();
   progressBar.style.width = "0%";
   body.style.cursor = "progress";
-  console.log("Request time:", requestTime);
   config.metadata = {
-    requestTime
+    startTime
   };
   return config;
 }, (error) => {
@@ -24,11 +23,10 @@ axios.interceptors.request.use(config => {
 
 // Response Interceptor
 axios.interceptors.response.use(response => {
-  const responseTime = new Date().getTime();
-  const requestTime  = response.config.metadata.requestTime;
+  const endTime = new Date().getTime();
+  const startTime  = response.config.metadata.startTime;
   body.style.cursor = "default";
-  console.log("Response time:", responseTime);
-  console.log("Total duration:", responseTime - requestTime);
+  console.log("Response time:", endTime - startTime);
   return response;
 }, (error) => {
   return Promise.reject(error);
@@ -54,13 +52,24 @@ export async function getData(url) {
 }
 
 export async function handleFavourite(imgId) {
-  console.log("New POST request...");
+
+  const favourites = await getFavourites();
+  // return favourite if it is already in favourites
+  const favourite = favourites.find(fav => fav.image_id === imgId);
 
   try {
-    const newFavourite = await axios.post("/favourites", {
-      image_id: imgId
-    });
-    return newFavourite;
+
+    if (favourite) {
+      console.log("Deleted favourite")
+      const deletedFavourite = await axios.delete(`/favourites/${favourite.id}`);
+      return deletedFavourite;
+    } else {
+      console.log("Added favourite")
+      const newFavourite = await axios.post("/favourites", {
+        image_id: imgId
+      });
+      return newFavourite;
+    }
 
   } catch(error) {
     console.log(error);

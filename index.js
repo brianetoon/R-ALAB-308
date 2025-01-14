@@ -13,12 +13,11 @@ const getFavouritesBtn = document.getElementById("getFavouritesBtn");
 
 initialLoad();
 
-// Retrieve all favourites
 getFavouritesBtn.addEventListener("click", renderFavorites);
+breedSelect.addEventListener("change", handleSelect);
 
-// Favourite an image
 export async function favourite(imgId) {
-  handleFavourite(imgId);
+  await handleFavourite(imgId);
 }
 
 async function initialLoad() {
@@ -37,8 +36,6 @@ async function initialLoad() {
   renderBreed(breedSelect.value);
 }
 
-breedSelect.addEventListener("change", handleSelect);
-
 async function handleSelect(e) {
   renderBreed(e.target.value);
 }
@@ -54,16 +51,20 @@ async function renderBreed(breedId) {
 
 async function renderFavorites() {
   const favourites = await getFavourites();
-
-  let formattedFavourites = [];
-  favourites.forEach(fav => {
-    formattedFavourites.push(fav.image);
-  });
-
   Carousel.clear();
-  infoDump.innerHTML = `<h3 class="text-center">😻 Your Favourite Cats 😻</h3>`;
-  populateCarousel(formattedFavourites);
-  Carousel.start();
+
+  if (favourites.length > 0) {
+    let formattedFavourites = [];
+    favourites.forEach(fav => {
+      formattedFavourites.push(fav.image);
+    });
+  
+    infoDump.innerHTML = `<h3 class="text-center">😻 Your Favourite Cats 😻</h3>`;
+    populateCarousel(formattedFavourites);
+    Carousel.start();
+  } else {
+    infoDump.innerHTML = `<h3 class="text-center">😿 You have no favourite cats 😿</h3>`;
+  }
 }
 
 function populateCarousel(catArray) {
